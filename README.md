@@ -1,3 +1,3 @@
 # Rocky
 
-HTTP server from scratch in GO, won't be the most Informative one, cause I just got started with go
+need to find some thing for this one, will update once I find something intresting to work on
