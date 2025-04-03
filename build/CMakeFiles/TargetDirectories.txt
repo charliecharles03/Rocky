@@ -1,4 +1,0 @@
-/home/charlie/Documents/github/Rocky/build/CMakeFiles/glad.dir
-/home/charlie/Documents/github/Rocky/build/CMakeFiles/OpenGLApp.dir
-/home/charlie/Documents/github/Rocky/build/CMakeFiles/edit_cache.dir
-/home/charlie/Documents/github/Rocky/build/CMakeFiles/rebuild_cache.dir
