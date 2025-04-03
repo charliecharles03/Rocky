@@ -1,13 +1,14 @@
 #include <iostream>
-#include "glad.h"
-#include <GLFW/glfw3.h>  
+#include "include/glad/glad.h"
+/*#include <GLFW/glfw3.h>  
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
-
+*/
 int main() {
+    /*
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -31,6 +32,8 @@ int main() {
         glfwPollEvents();    
     }
     glfwTerminate();
+    */
+    std::cout << "Hello, OpenGL!" << std::endl;
     return 0;
 }
 

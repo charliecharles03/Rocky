@@ -117,24 +117,61 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named openGlExample
+# Target rules for targets named glad
 
 # Build rule for target.
-openGlExample: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 openGlExample
-.PHONY : openGlExample
+glad: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 glad
+.PHONY : glad
 
 # fast build rule for target.
-openGlExample/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/openGlExample.dir/build.make CMakeFiles/openGlExample.dir/build
-.PHONY : openGlExample/fast
+glad/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/build
+.PHONY : glad/fast
+
+#=============================================================================
+# Target rules for targets named OpenGLApp
+
+# Build rule for target.
+OpenGLApp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 OpenGLApp
+.PHONY : OpenGLApp
+
+# fast build rule for target.
+OpenGLApp/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLApp.dir/build.make CMakeFiles/OpenGLApp.dir/build
+.PHONY : OpenGLApp/fast
+
+glad.o: glad.c.o
+.PHONY : glad.o
+
+# target to build an object file
+glad.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/glad.c.o
+.PHONY : glad.c.o
+
+glad.i: glad.c.i
+.PHONY : glad.i
+
+# target to preprocess a source file
+glad.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/glad.c.i
+.PHONY : glad.c.i
+
+glad.s: glad.c.s
+.PHONY : glad.s
+
+# target to generate assembly for a file
+glad.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/glad.c.s
+.PHONY : glad.c.s
 
 main.o: main.cpp.o
 .PHONY : main.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/openGlExample.dir/build.make CMakeFiles/openGlExample.dir/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLApp.dir/build.make CMakeFiles/OpenGLApp.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -142,7 +179,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/openGlExample.dir/build.make CMakeFiles/openGlExample.dir/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLApp.dir/build.make CMakeFiles/OpenGLApp.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -150,7 +187,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/openGlExample.dir/build.make CMakeFiles/openGlExample.dir/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLApp.dir/build.make CMakeFiles/OpenGLApp.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -161,7 +198,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... openGlExample"
+	@echo "... OpenGLApp"
+	@echo "... glad"
+	@echo "... glad.o"
+	@echo "... glad.i"
+	@echo "... glad.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
