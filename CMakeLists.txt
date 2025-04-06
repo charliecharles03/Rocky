@@ -5,6 +5,9 @@ project(OpenGLApp)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
+#copy libs to build
+file(COPY ${CMAKE_SOURCE_DIR}/lib DESTINATION ${CMAKE_BINARY_DIR})
+
 # Add GLAD
 add_library(glad glad.c)
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include) 

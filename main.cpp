@@ -2,30 +2,40 @@
 #include "include/glad/glad.h"
 #include <GLFW/glfw3.h>  
 #include <math.h>
+#include <fstream>
+#include <sstream>
+#include <string>
 
-/*
- *  get triangle on the screen [ ]
- * take input from mouse keyboard
- * */
-//shaders
+std::string readFile(const std::string& filePath) {
+    std::ifstream file(filePath);
+    std::stringstream buffer;
 
-// Vertex Shader source code
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"out vec4 vertexColor;"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos,1.0);\n"
-"}\0";
+    if (!file) {
+        std::cerr << "Failed to open shader file: " << filePath << std::endl;
+        return "";
+    }
 
-//Fragment Shader source code
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-"}\n\0";
+    buffer << file.rdbuf();
+    return buffer.str();
+}
 
+const char *vertexShaderSource ="#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aColor;\n"
+    "out vec3 ourColor;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos, 1.0);\n"
+    "   ourColor = aColor;\n"
+    "}\0";
+
+const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "in vec3 ourColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(ourColor, 1.0);\n"
+    "}\n\0";
 
 
 int main()
@@ -63,7 +73,6 @@ int main()
 	glViewport(0, 0, 800, 800);
 
 
-
 	// Create Vertex Shader Object and get its reference
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	// Attach Vertex Shader source to the Vertex Shader Object
@@ -90,18 +99,18 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-
-
     float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-    };
+        // positions         // colors
+        0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+        0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+    };   
+
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 3,  // first Triangle
         1, 2, 3   // second Triangle
     };
+
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -115,9 +124,11 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
+    
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
 
@@ -143,8 +154,9 @@ int main()
 		glUseProgram(shaderProgram);
 		// Bind the VAO so OpenGL knows to use it
 		glBindVertexArray(VAO);
+        
 		// Draw the triangle using the GL_TRIANGLES primitive
-		glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
+		glDrawArrays(GL_TRIANGLES,0,3);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
