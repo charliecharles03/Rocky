@@ -1,23 +1,10 @@
 #include <iostream>
+#include "include/imgui/imgui.h"
+#include "include/imgui/backends/imgui_impl_glfw.h"
+#include "include/imgui/backends/imgui_impl_opengl3.h"
 #include "include/glad/glad.h"
 #include <GLFW/glfw3.h>  
 #include <math.h>
-#include <fstream>
-#include <sstream>
-#include <string>
-
-std::string readFile(const std::string& filePath) {
-    std::ifstream file(filePath);
-    std::stringstream buffer;
-
-    if (!file) {
-        std::cerr << "Failed to open shader file: " << filePath << std::endl;
-        return "";
-    }
-
-    buffer << file.rdbuf();
-    return buffer.str();
-}
 
 const char *vertexShaderSource ="#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -38,64 +25,45 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "}\n\0";
 
 
+    float myFloat = 0.5f;
 int main()
 {
-	// Initialize GLFW
 	glfwInit();
 
-	// Tell GLFW what version of OpenGL we are using 
-	// In this case we are using OpenGL 3.3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	// Tell GLFW we are using the CORE profile
-	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(800, 800, "dumb triangle", NULL, NULL);
-	// Error check if the window fails to create
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	// Introduce the window into the current context
 	glfwMakeContextCurrent(window);
 
-	//Load GLAD so it configures OpenGL
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD\n";
         return -1;
     }
-	// Specify the viewport of OpenGL in the Window
-	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, 800, 800);
 
 
-	// Create Vertex Shader Object and get its reference
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	// Attach Vertex Shader source to the Vertex Shader Object
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	// Compile the Vertex Shader into machine code
 	glCompileShader(vertexShader);
 
-	// Create Fragment Shader Object and get its reference
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	// Attach Fragment Shader source to the Fragment Shader Object
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	// Compile the Vertex Shader into machine code
 	glCompileShader(fragmentShader);
 
-	// Create Shader Program Object and get its reference
 	GLuint shaderProgram = glCreateProgram();
-	// Attach the Vertex and Fragment Shaders to the Shader Program
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
-	// Wrap-up/Link all the shaders together into the Shader Program
 	glLinkProgram(shaderProgram);
 
-	// Delete the now useless Vertex and Fragment Shader objects
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
@@ -115,7 +83,6 @@ int main()
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -129,48 +96,80 @@ int main()
     
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
 
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
 
+    double previousTime = glfwGetTime();
+    int frameCount = 0;
 
-    // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
 
-    // render loop
+
+
     while (!glfwWindowShouldClose(window))
 	{
-		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		// Clean the back buffer and assign the new color to it
-		glClear(GL_COLOR_BUFFER_BIT);
-		// Tell OpenGL which Shader Program we want to use
-		glUseProgram(shaderProgram);
-		// Bind the VAO so OpenGL knows to use it
-		glBindVertexArray(VAO);
-        
-		// Draw the triangle using the GL_TRIANGLES primitive
-		glDrawArrays(GL_TRIANGLES,0,3);
-		// Swap the back buffer with the front buffer
-		glfwSwapBuffers(window);
-		// Take care of all GLFW events
-		glfwPollEvents();
-	}
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // imgui
+        // feed inputs to dear imgui, start new frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame(); 
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+
+        glDrawArrays(GL_TRIANGLES,0,3);
+
+        // Setup
+        const int NUM_SAMPLES = 100;
+        static float fpsSamples[NUM_SAMPLES] = {};
+        static int fpsIndex = 0;
+
+        // Each frame
+        fpsSamples[fpsIndex] = ImGui::GetIO().Framerate;
+        fpsIndex = (fpsIndex + 1) % NUM_SAMPLES;
+
+        // Calculate average
+        float fpsSum = 0.0f;
+        for (int i = 0; i < NUM_SAMPLES; ++i) {
+            fpsSum += fpsSamples[i];
+        }
+        float avgFps = fpsSum / NUM_SAMPLES;
+
+        // render your GUI
+        ImGui::Begin("Demo window");
+        ImGui::PlotLines("FPS Graph", fpsSamples, NUM_SAMPLES, 0, nullptr, 0.0f, 144.0f, ImVec2(0, 60));
+        ImGui::Text("FPS number %f",avgFps);
+        ImGui::End();
+
+        // Render dear imgui into screen
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
 
-
-	// Delete all the objects we've created
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteProgram(shaderProgram);
-	// Delete window before ending the program
 	glfwDestroyWindow(window);
-	// Terminate GLFW before ending the program
 	glfwTerminate(); return 0;
 }
