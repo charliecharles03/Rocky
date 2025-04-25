@@ -7,6 +7,7 @@
 #include <math.h>
 #include "include/shader_s.h"
 #include "include/test.h"
+#include "include/shader.h"
 
 const char *vertexShaderSource ="#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
@@ -109,7 +110,6 @@ int main()
     }
     glViewport(0, 0, 800, 800);
 
-    Shader ourShader("3.3.shader.vs", "3.3.shader.fs"); 
 
     GLuint vertexShader = createVertexShader();
     GLuint fragmentShader = createFragmentShader();
