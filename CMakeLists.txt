@@ -10,10 +10,6 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 
-
-
-
-
 # Include directories
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
@@ -24,14 +20,15 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
 # GLAD library
-add_library(glad glad.c)
+add_library(glad src/glad.c)
+
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 # Copy 'lib' directory to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/lib DESTINATION ${CMAKE_BINARY_DIR})
 
 # Executable
-add_executable(OpenGLApp main.cpp)
+add_executable(OpenGLApp src/main.cpp)
 
 # Link libraries to executable
 target_link_libraries(OpenGLApp

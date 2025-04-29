@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/glad/glad.h"
+#include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>  
 #include <math.h>
 
@@ -127,7 +127,9 @@ int main()
 
     unsigned int indices[] = {  
         0, 1, 2,  
-        1, 0, 4   
+        0, 3, 4,
+        0, 4, 1,
+        0, 2, 3,
     };
 
     dummy bufferResponse =  bufferCreator(vertices,sizeof(vertices),indices,sizeof(indices));
@@ -142,7 +144,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(bufferResponse.vao);
-        glDrawArrays(GL_TRIANGLES,0,6);
+          glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
