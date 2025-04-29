@@ -1,7 +1,4 @@
 #include <iostream>
-#include "include/imgui/imgui.h"
-#include "include/imgui/backends/imgui_impl_glfw.h"
-#include "include/imgui/backends/imgui_impl_opengl3.h"
 #include "include/glad/glad.h"
 #include <GLFW/glfw3.h>  
 #include <math.h>
@@ -139,61 +136,17 @@ int main()
     double previousTime = glfwGetTime();
     int frameCount = 0;
 
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-
-    ImGui::StyleColorsDark();
-
-
-
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame(); 
-
         glUseProgram(shaderProgram);
         glBindVertexArray(bufferResponse.vao);
-
-
         glDrawArrays(GL_TRIANGLES,0,6);
-
-        const int NUM_SAMPLES = 100;
-        static float fpsSamples[NUM_SAMPLES] = {};
-        static int fpsIndex = 0;
-
-        fpsSamples[fpsIndex] = ImGui::GetIO().Framerate;
-        fpsIndex = (fpsIndex + 1) % NUM_SAMPLES;
-
-        float fpsSum = 0.0f;
-        for (int i = 0; i < NUM_SAMPLES; ++i) {
-            fpsSum += fpsSamples[i];
-        }
-        float avgFps = fpsSum / NUM_SAMPLES;
-
-        ImGui::Begin("Demo window");
-        ImGui::PlotLines("FPS Graph", fpsSamples, NUM_SAMPLES, 0, nullptr, 0.0f, 144.0f, ImVec2(0, 60));
-        ImGui::Text("FPS number %f",avgFps);
-        ImGui::End();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
 
     glDeleteVertexArrays(1, &bufferResponse.vao);
