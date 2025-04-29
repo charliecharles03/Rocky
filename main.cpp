@@ -5,9 +5,6 @@
 #include "include/glad/glad.h"
 #include <GLFW/glfw3.h>  
 #include <math.h>
-#include "include/shader_s.h"
-#include "include/test.h"
-#include "include/shader.h"
 
 const char *vertexShaderSource ="#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"

@@ -39,7 +39,7 @@ target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
 file(COPY ${CMAKE_SOURCE_DIR}/lib DESTINATION ${CMAKE_BINARY_DIR})
 
 # Executable
-add_executable(OpenGLApp main.cpp test.cpp)
+add_executable(OpenGLApp main.cpp)
 
 # Link libraries to executable
 target_link_libraries(OpenGLApp
