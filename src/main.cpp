@@ -1,7 +1,11 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <iostream>
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>  
 #include <math.h>
+#include "../include/std/stb_image.h"
+
 
 const char *vertexShaderSource ="#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
@@ -92,9 +96,36 @@ dummy bufferCreator(float vertices[], int verticesArraySize, unsigned int indice
 }
 
 
+void createTexture(){
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char g = 'g';
+    unsigned char *data = &g;//stbi_load("../util/brik.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout<<"gl generated texture buffers for us";
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    //stbi_image_free(data);
+}
+
+
 int main()
 {
-
+    createTexture();
     // creating GLFW window 
     GLFWwindow* window = windowMaker();
 
@@ -117,26 +148,22 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    float vertices[] = {
-        0.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,      //0
-        +0.5f, +0.5f, 0.0f,  0.0f, 1.0f, 0.0f,    // 2
-        -0.5f, +0.5f, 0.0f,  1.0f, 0.0f, 0.0f,    //1
-        -0.5f,  -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,    //3
-        +0.5f,  -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,    //4
-    };   
-
+   float vertices[] = {
+        // positions          // colors          
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  
+    };
     unsigned int indices[] = {  
-        0, 1, 2,  
-        0, 3, 4,
-        0, 4, 1,
-        0, 2, 3,
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
     };
 
     dummy bufferResponse =  bufferCreator(vertices,sizeof(vertices),indices,sizeof(indices));
 
     glBindVertexArray(0); 
     double previousTime = glfwGetTime();
-    int frameCount = 0;
 
     while (!glfwWindowShouldClose(window))
     {
@@ -144,7 +171,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(bufferResponse.vao);
-          glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
