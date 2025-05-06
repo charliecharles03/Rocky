@@ -10,21 +10,25 @@
 const char *vertexShaderSource ="#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "layout (location = 1) in vec3 aColor;\n"
+"layout (location = 2) in vec2 aTexCoord;\n"
 "out vec3 ourColor;\n"
+"out vec2 TexCoord;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos, 1.0);\n"
 "   ourColor = aColor;\n"
+"   TexCoord = aTexCoord;\n"
 "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "in vec3 ourColor;\n"
+"in vec2 TexCoord;\n"
+"uniform sampler2D ourTexture;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(ourColor, 1.0);\n"
+"FragColor = texture(ourTexture, TexCoord);\n"
 "}\n\0";
-
 
 float myFloat = 0.5f;
 
@@ -33,6 +37,31 @@ typedef struct{
     unsigned int vbo;
     unsigned int ebo;
 } dummy;
+
+
+void checkCompileErrors(unsigned int shader, std::string type)
+    {
+        int success;
+        char infoLog[1024];
+        if (type != "PROGRAM")
+        {
+            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+            if (!success)
+            {
+                glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            }
+        }
+        else
+        {
+            glGetProgramiv(shader, GL_LINK_STATUS, &success);
+            if (!success)
+            {
+                glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            }
+        }
+    }
 
 
 
@@ -59,6 +88,7 @@ GLuint createVertexShader(){
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
+    checkCompileErrors(vertexShader, "VERTEX");
     return vertexShader;
 }
 
@@ -66,6 +96,7 @@ GLuint createFragmentShader(){
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
+    checkCompileErrors(fragmentShader, "FRAGMENT");
     return fragmentShader;
 }
 
@@ -83,11 +114,15 @@ dummy bufferCreator(float vertices[], int verticesArraySize, unsigned int indice
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesArraySize ,indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0); 
@@ -95,8 +130,14 @@ dummy bufferCreator(float vertices[], int verticesArraySize, unsigned int indice
     return buffers;
 }
 
+/*
+ * 
+glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+glEnableVertexAttribArray(2);
+ * */
 
-void createTexture(){
+
+unsigned int createTexture(){
     unsigned int texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -107,8 +148,7 @@ void createTexture(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, nrChannels;
-    unsigned char g = 'g';
-    unsigned char *data = &g;//stbi_load("../util/brik.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("util/brik.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -118,14 +158,16 @@ void createTexture(){
     else
     {
         std::cout << "Failed to load texture" << std::endl;
+
     }
-    //stbi_image_free(data);
+    stbi_image_free(data);
+
+    return texture;
 }
 
 
 int main()
 {
-    createTexture();
     // creating GLFW window 
     GLFWwindow* window = windowMaker();
 
@@ -134,7 +176,7 @@ int main()
         return -1;
     }
     glViewport(0, 0, 800, 800);
-
+    unsigned int  Texture =  createTexture();
 
     GLuint vertexShader = createVertexShader();
     GLuint fragmentShader = createFragmentShader();
@@ -148,13 +190,14 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-   float vertices[] = {
-        // positions          // colors          
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,  
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,  
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  
+    float vertices[] = {
+        // positions          // colors           // texture coords
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
+
     unsigned int indices[] = {  
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
@@ -170,6 +213,7 @@ int main()
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
+        glBindTexture(GL_TEXTURE_2D, Texture);
         glBindVertexArray(bufferResponse.vao);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
         glfwSwapBuffers(window);

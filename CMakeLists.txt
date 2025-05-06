@@ -30,6 +30,7 @@ target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 # Copy 'lib' directory to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/lib DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/util DESTINATION ${CMAKE_BINARY_DIR})
 
 
 # Link libraries to executable
