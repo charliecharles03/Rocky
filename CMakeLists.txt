@@ -19,6 +19,8 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/include/std
 )
 
+include_directories(lib)
+
 # Find required packages
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
