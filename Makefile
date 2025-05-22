@@ -13,7 +13,7 @@ $(BUILD_DIR)/$(TARGET):
 	cd $(BUILD_DIR) && cmake ..
 	cd $(BUILD_DIR) && make
 
-run: all
+run: clean all
 	./$(BUILD_DIR)/$(TARGET)
 
 clean:
