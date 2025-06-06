@@ -47,7 +47,8 @@ To build and run **Rocky**, follow these steps:
 
 ## 🚀 Future Improvements  
 
-- Add **textures** and **shaders**.  
-- Implement **keyboard controls**.  
-- Support **3D transformations** with GLM.  
+- Add **textures** and **shaders**. [x] 
+- Implement **keyboard controls**. [x] 
+- Support **3D transformations** with GLM. [x]
+- add gravity f = m x a first but refine it a bit more than the goofy looking thing. [ ]  
 
