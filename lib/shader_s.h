@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
 
 inline unsigned int ID;
 
@@ -88,6 +89,11 @@ inline void setInt(const std::string &name, int value)
 inline void setFloat(const std::string &name, float value)
 { 
     glUniform1f(glGetUniformLocation(ID, name.c_str()), value); 
+}
+
+inline void setMat4(const std::string &name, const glm::mat4 &mat)
+{
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
 
