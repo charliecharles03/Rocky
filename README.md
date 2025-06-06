@@ -1,6 +1,6 @@
 # Rocky  
 
-**Rocky** is a simple OpenGL project that renders a **rectangle**—though it looks like a **square** to me.  
+**Rocky** is a OpenGL project to simulate real world physics
 
 ## 🛠 Prerequisites  
 
@@ -41,7 +41,8 @@ To build and run **Rocky**, follow these steps:
 ## 📌 What Does It Do?  
 
 - Opens an **OpenGL window** using GLFW.  
-- Renders a **rectangle** (which looks like a **square** to me 🤔).  
+- Renders cubes 9 of them to be precise.
+- gives you the ability to move around using w a s d and escape to close the window
 - Displays the output in a **resizable window**.  
 
 ## 🚀 Future Improvements  
